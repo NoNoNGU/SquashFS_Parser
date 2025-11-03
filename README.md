@@ -26,6 +26,7 @@
 lz4==4.4.4
 python-lzo==1.15
 zstandard==0.25.0
+'''
 
 ### 설치 명령어
 pip install -r requirements.txt
