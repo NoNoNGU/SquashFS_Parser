@@ -45,6 +45,8 @@ Fragment 엔트리 수
 사용자 고유 tail fragment 수
 최대 디렉터리 깊이
 
+<img width="487" height="385" alt="image" src="https://github.com/user-attachments/assets/3fe93854-4e74-440b-bc33-175912b4283a" />
+
 ** 옵션
 -o : 출력 디렉터리 지정
 예시 :python squashFS_parser.py firmware.img -o ./extracted_firmware
