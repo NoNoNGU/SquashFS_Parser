@@ -67,10 +67,6 @@ python squashFS_parser.py firmware.img --no-meta
 |---|---|---|
 | `-o, --output <DIR>` | 추출 대상 출력 디렉터리 지정 | `./extracted` |
 | `--no-meta` | 권한/소유권/xattr 등 메타데이터 적용 생략 | 적용함 |
-| `-v, --verbose` *(있다면)* | 상세 로그 출력 | 간략 로그 |
-| `--force` *(있다면)* | 존재하는 출력 디렉터리 위에 덮어쓰기 | 안전 모드 |
-
-> 실제 스크립트에 구현된 옵션에 맞게 필요 시 조정하세요.
 
 ---
 
