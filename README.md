@@ -1,27 +1,27 @@
-# SquashFS 파서 및 추출기 (SquashFS_Parser)
+# SquashFS Parser & Extractor (SquashFS_Parser)
 
-SquashFS **버전 4** 이미지(.sqsh, .img 등)를 파싱하고, 이미지 내 파일·디렉터리·심볼릭 링크를 로컬 디스크로 복원하는 Python 기반 도구입니다. 권한/소유권/확장속성 등 메타데이터 적용도 지원합니다.
+This script is a Python-based tool that parses **SquashFS version 4** filesystem images (.sqsh, .img, etc.) and restores files, directories, and symbolic links contained in the image to a local directory. It also supports applying metadata such as permissions/ownership/extended attributes.
 
-## 🚀 주요 기능
+## 🚀 Key Features
 
-- **SquashFS v4 완전 지원**
-- **다양한 압축 방식 지원**
-  - 기본: `gzip`, `xz`, `lzma`
-  - 선택(라이브러리 설치 필요): `lz4`, `zstd`, `lzo`
-- **메타데이터 보존**
-  - 권한(`chmod`), 소유자/그룹(`chown`) — UID/GID 테이블 파싱
-  - 확장 속성(**xattr**)
-- **재귀 추출**
-  - 디렉터리 트리를 보존하여 동일한 구조로 추출
-- **결과 요약 출력**
-  - 압축 방식, 블록 크기, Inode/파일/디렉터리/심볼릭 링크 수, 총 기록 바이트, 평균 파일 크기, fragment 정보, 최대 디렉터리 깊이 등
+- **Full SquashFS v4 support**
+- **Multiple compression formats supported**
+  - Built-in: `gzip`, `xz`, `lzma`
+  - Optional (requires extra libraries): `lz4`, `zstd`, `lzo`
+- **Metadata preservation**
+  - Permissions (`chmod`), owner/group (`chown`) — parses UID/GID tables
+  - Extended attributes (**xattr**)
+- **Recursive extraction**
+  - Recreates the directory tree to match the original structure
+- **Summary output**
+  - Prints compression type, block size, inode/file/directory/symlink counts, total bytes written, average file size, fragment info, max directory depth, etc.
 
 ---
 
-## 🔧 요구 사항
+## 🔧 Requirements
 
 - Python 3.8+
-- (선택) 추가 압축 포맷용 라이브러리
+- (Optional) Extra libraries for additional compression formats
 
 **requirements.txt**
 ```txt
@@ -30,9 +30,9 @@ python-lzo==1.15
 zstandard==0.25.0
 ```
 
-> `gzip/xz/lzma`는 표준 라이브러리 혹은 일반 배포판에서 기본 지원하는 경우가 많습니다. `lz4`, `zstd`, `lzo`는 위의 패키지를 설치해야 동작합니다.
+> `gzip/xz/lzma` are typically supported by the standard library or common distributions. To handle `lz4`, `zstd`, and `lzo`, you must install the packages above.
 
-### 설치
+### Installation
 
 ```bash
 pip install -r requirements.txt
@@ -40,37 +40,37 @@ pip install -r requirements.txt
 
 ---
 
-## ▶️ 빠른 시작
+## ▶️ Quick Start
 
 ```bash
-python squashFS_parser.py <이미지_파일> [-o <출력_디렉터리>] [--no-meta]
+python squashFS_parser.py <image_file> [-o <output_directory>] [--no-meta]
 ```
 
-예시:
+Examples:
 
 ```bash
-# 기본 추출 (현재 디렉터리에 ./extracted 생성)
+# Basic extraction (creates ./extracted in the current directory)
 python squashFS_parser.py firmware.img
 
-# 출력 디렉터리 지정
+# Specify output directory
 python squashFS_parser.py firmware.img -o ./extracted_firmware
 
-# 메타데이터 적용 생략(권한/소유권/xattr 미적용)
+# Skip metadata application (do not apply permissions/ownership/xattr)
 python squashFS_parser.py firmware.img --no-meta
 ```
 
 ---
 
-## 🧰 명령줄 옵션
+## 🧰 Command Line Options
 
-| 옵션 | 설명 | 기본값 |
+| Option | Description | Default |
 |---|---|---|
-| `-o, --output <DIR>` | 추출 대상 출력 디렉터리 지정 | `./extracted` |
-| `--no-meta` | 권한/소유권/xattr 등 메타데이터 적용 생략 | 적용함 |
+| `-o, --output <DIR>` | Specify the output directory for extraction | `./extracted` |
+| `--no-meta` | Skip applying metadata such as permissions/ownership/xattr | Apply metadata |
 
 ---
 
-## 📦 실행 결과 예시
+## 📦 Example Output
 
 ```
 [+] SquashFS v4.0 block_size=65536 comp_id=4(xz)
@@ -95,32 +95,32 @@ python squashFS_parser.py firmware.img --no-meta
 ====================================
 ```
 
-### 요약 항목 설명
+### Explanation of summary fields
 
-- **Version / Block size / Compression**: 이미지 슈퍼블록에서 읽은 기본 파라미터  
-- **Inodes (super)**: 슈퍼블록이 가리키는 총 Inode 수  
-- **Entries extracted**: 실제로 추출된 엔트리 총합 (디렉터리/파일/심볼릭 링크/기타)  
-- **Total bytes written**: 디스크에 기록된 총 바이트 수  
-- **Avg non-empty file**: 비어 있지 않은 파일들의 평균 크기  
-- **Fragment entries (SB)**: 슈퍼블록에 기록된 fragment 엔트리 수  
-- **Unique tail fragments**: tail fragment 중 중복되지 않는 조각 수  
-- **Max directory depth**: 탐색한 디렉터리 트리의 최대 깊이
-
----
-
-## 📝 참고 사항
-
-- 루트 권한이 필요한 파일 소유권/권한 설정(`chown`, `chmod`)은 OS/권한 환경에 따라 일부 항목 적용이 제한될 수 있습니다.  
-- 선택 압축 포맷(`lz4`, `zstd`, `lzo`)을 가진 이미지의 경우, 해당 파이썬 패키지가 설치되어 있어야 정상 추출됩니다.  
-- 심볼릭 링크는 기본적으로 링크 자체를 복원합니다. 링크 대상이 이미지 밖에 있으면 깨진 링크가 될 수 있습니다.
+- **Version / Block size / Compression**: Basic parameters read from the image superblock  
+- **Inodes (super)**: Total number of inodes referenced by the superblock  
+- **Entries extracted**: Total number of entries actually extracted (directories/files/symlinks/other)  
+- **Total bytes written**: Total number of bytes written to disk  
+- **Avg non-empty file**: Average size of non-empty files  
+- **Fragment entries (SB)**: Number of fragment entries recorded in the superblock  
+- **Unique tail fragments**: Number of unique tail fragments with no duplicates  
+- **Max directory depth**: Maximum directory depth observed while traversing the tree
 
 ---
 
-## 🧪 개발/디버그 팁
+## 📝 Notes
 
-- 파서가 특정 메타데이터(UID/GID/xattr)를 적용하지 못한다면, `--no-meta`로 동작을 분리해 파싱/추출 로직부터 확인하세요.  
-- 문제가 발생한 이미지의 `superblock`/`inode table`/`fragment table` 오프셋과 크기를 로그로 출력해 추적하면 원인 파악이 빠릅니다.
+- Applying file ownership/permission (`chown`, `chmod`) that requires root privileges may be partially restricted depending on OS/privilege environment.  
+- For images that use optional compression formats (`lz4`, `zstd`, `lzo`), the corresponding Python packages must be installed for successful extraction.  
+- Symbolic links are restored as links. If the link target points outside the image, the restored symlink may be broken.
 
 ---
 
-문의나 개선 제안이 있다면 이슈로 남겨 주세요! 🙌
+## 🧪 Development / Debug Tips
+
+- If the parser fails to apply certain metadata (UID/GID/xattr), run with `--no-meta` first to isolate parsing/extraction logic from metadata application.  
+- When debugging, log the offsets and sizes of the `superblock`, `inode table`, and `fragment table` for the problematic image to quickly locate the root cause.
+
+---
+
+If you have questions or suggestions for improvement, please open an issue! 🙌
